@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -130,6 +129,38 @@
       color: red;
     }
 
+    .file-upload-container {
+      margin: 15px 0;
+    }
+
+    .file-upload-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .file-upload-input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .preview-container {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .preview-image {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
     @media (max-width: 768px) {
       h1 {
         font-size: 2em;
@@ -164,6 +195,10 @@
         width: 100%;
         padding: 8px 0;
       }
+      .preview-image {
+        width: 80px;
+        height: 80px;
+      }
     }
   </style>
 </head>
@@ -183,7 +218,7 @@
   <main>
     <div class="form-section">
       <h2 id="formTitle">Online Complaint Registration</h2>
-      <form id="complaintForm" onsubmit="handleSubmit(event)">
+      <form id="complaintForm" onsubmit="handleSubmit(event)" enctype="multipart/form-data">
         <input type="text" id="namePlaceholder" name="username" placeholder="Name" required>
         <input type="tel" id="mobilePlaceholder" name="mobile" placeholder="Enter Your Mobile Number" required pattern="\d{10}">
         <input type="email" id="emailPlaceholder" name="email" placeholder="Enter Your Email ID (Optional)">
@@ -200,6 +235,13 @@
         </select>
         <input type="text" id="areaPlaceholder" name="area" placeholder="Enter Area / Society Keyword" required>
         <input type="text" id="pinPlaceholder" name="pincode" placeholder="Pin Code" required>
+
+        <!-- Photo Upload Section -->
+        <div class="file-upload-container">
+          <label for="photoUpload" id="photoUploadLabel" class="file-upload-label">Upload Photos (Optional)</label>
+          <input type="file" id="photoUpload" class="file-upload-input" name="complaintPhotos" multiple accept="image/*">
+          <div id="imagePreview" class="preview-container"></div>
+        </div>
 
         <button type="submit" id="submitBtn">Submit Complaint</button>
       </form>
@@ -232,6 +274,7 @@
       document.getElementById("areaPlaceholder").placeholder = isGujarati ? "વિશિષ્ટ વિસ્તાર / સોસાયટી નામ દાખલ કરો" : "Enter Area / Society Keyword";
       document.getElementById("pinPlaceholder").placeholder = isGujarati ? "પિન કોડ" : "Pin Code";
       document.getElementById("submitBtn").innerText = isGujarati ? "ફરિયાદ દાખલ કરો" : "Submit Complaint";
+      document.getElementById("photoUploadLabel").innerText = isGujarati ? "ફોટો અપલોડ કરો (વૈકલ્પિક)" : "Upload Photos (Optional)";
       document.querySelector(".language-btn").innerText = isGujarati ? "Switch to English" : "Switch to ગુજરાતી";
 
       document.getElementById("problemType").innerHTML = isGujarati
@@ -266,6 +309,30 @@
       document.getElementById("helpBtn").innerText = isGujarati ? "મદદ / ટ્યુટોરિયલ" : "Help / Tutorial";
     }
 
+    // Image preview functionality
+    document.getElementById('photoUpload').addEventListener('change', function(event) {
+      const previewContainer = document.getElementById('imagePreview');
+      previewContainer.innerHTML = '';
+      
+      const files = event.target.files;
+      if (files) {
+        Array.from(files).forEach(file => {
+          if (file.type.match('image.*')) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+              const img = document.createElement('img');
+              img.src = e.target.result;
+              img.className = 'preview-image';
+              previewContainer.appendChild(img);
+            }
+            
+            reader.readAsDataURL(file);
+          }
+        });
+      }
+    });
+
     function openTutorial() {
       window.open("https://youtube.com/shorts/AutXP_UbYnU?si=GiEwEI4evpbC01hX ", "_blank");
     }
@@ -279,9 +346,12 @@
       document.getElementById("successMsg").style.display = "none";
       document.getElementById("errorMsg").style.display = "none";
 
+      // Here you would typically send the form data to a server
+      // For demo purposes, we'll just show the success message
       setTimeout(() => {
         document.getElementById("successMsg").style.display = "block";
         document.getElementById("complaintForm").reset();
+        document.getElementById("imagePreview").innerHTML = '';
         btn.disabled = false;
         btn.innerText = isGujarati ? "ફરિયાદ દાખલ કરો" : "Submit Complaint";
 
