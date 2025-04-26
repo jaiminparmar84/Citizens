@@ -129,38 +129,6 @@
       color: red;
     }
 
-    .file-upload-container {
-      margin: 15px 0;
-    }
-
-    .file-upload-label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: bold;
-    }
-
-    .file-upload-input {
-      width: 100%;
-      padding: 8px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-
-    .preview-container {
-      margin-top: 10px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .preview-image {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-
     @media (max-width: 768px) {
       h1 {
         font-size: 2em;
@@ -195,10 +163,6 @@
         width: 100%;
         padding: 8px 0;
       }
-      .preview-image {
-        width: 80px;
-        height: 80px;
-      }
     }
   </style>
 </head>
@@ -224,24 +188,17 @@
         <input type="email" id="emailPlaceholder" name="email" placeholder="Enter Your Email ID (Optional)">
         <select id="problemType" name="problem" required>
           <option value="">-- Problem Type --</option>
-          <option value="water">Water Issue</option>
+          <option value="Water Issue">Water Issue</option>
           <option value="Drainage">Drainage</option>
-          <option value="road">Road Damage</option>
-          <option value="garbage">Garbage Issue</option>
-          <option value="Tree">Tree Falling</option>
-          <option value="Health">Health-Inferior Quality of Food</option>
-          <option value="light">Light & Streetlight</option>
+          <option value="Road Damage">Road Damage</option>
+          <option value="Garbage Issue">Garbage Issue</option>
+          <option value="Tree Falling">Tree Falling</option>
+          <option value="Health-Inferior Quality of Food">Health-Inferior Quality of Food</option>
+          <option value="Light & Streetlight">Light & Streetlight</option>
           <option value="Parking Problem">Parking Problem in Commercial Building</option>
         </select>
         <input type="text" id="areaPlaceholder" name="area" placeholder="Enter Area / Society Keyword" required>
         <input type="text" id="pinPlaceholder" name="pincode" placeholder="Pin Code" required>
-
-        <!-- Photo Upload Section -->
-        <div class="file-upload-container">
-          <label for="photoUpload" id="photoUploadLabel" class="file-upload-label">Upload Photos (Optional)</label>
-          <input type="file" id="photoUpload" class="file-upload-input" name="complaintPhotos" multiple accept="image/*">
-          <div id="imagePreview" class="preview-container"></div>
-        </div>
 
         <button type="submit" id="submitBtn">Submit Complaint</button>
       </form>
@@ -274,7 +231,6 @@
       document.getElementById("areaPlaceholder").placeholder = isGujarati ? "વિશિષ્ટ વિસ્તાર / સોસાયટી નામ દાખલ કરો" : "Enter Area / Society Keyword";
       document.getElementById("pinPlaceholder").placeholder = isGujarati ? "પિન કોડ" : "Pin Code";
       document.getElementById("submitBtn").innerText = isGujarati ? "ફરિયાદ દાખલ કરો" : "Submit Complaint";
-      document.getElementById("photoUploadLabel").innerText = isGujarati ? "ફોટો અપલોડ કરો (વૈકલ્પિક)" : "Upload Photos (Optional)";
       document.querySelector(".language-btn").innerText = isGujarati ? "Switch to English" : "Switch to ગુજરાતી";
 
       document.getElementById("problemType").innerHTML = isGujarati
@@ -309,56 +265,50 @@
       document.getElementById("helpBtn").innerText = isGujarati ? "મદદ / ટ્યુટોરિયલ" : "Help / Tutorial";
     }
 
-    // Image preview functionality
-    document.getElementById('photoUpload').addEventListener('change', function(event) {
-      const previewContainer = document.getElementById('imagePreview');
-      previewContainer.innerHTML = '';
-      
-      const files = event.target.files;
-      if (files) {
-        Array.from(files).forEach(file => {
-          if (file.type.match('image.*')) {
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-              const img = document.createElement('img');
-              img.src = e.target.result;
-              img.className = 'preview-image';
-              previewContainer.appendChild(img);
-            }
-            
-            reader.readAsDataURL(file);
-          }
-        });
-      }
-    });
-
     function openTutorial() {
       window.open("https://youtube.com/shorts/AutXP_UbYnU?si=GiEwEI4evpbC01hX ", "_blank");
     }
 
     function handleSubmit(event) {
-      event.preventDefault();
-      const btn = document.getElementById("submitBtn");
-      btn.disabled = true;
-      btn.innerText = isGujarati ? "સબમિટ થઈ રહ્યું છે..." : "Submitting...";
+  event.preventDefault();
+  const btn = document.getElementById("submitBtn");
+  btn.disabled = true;
+  btn.innerText = isGujarati ? "સબમિટ થઈ રહ્યું છે..." : "Submitting...";
 
-      document.getElementById("successMsg").style.display = "none";
-      document.getElementById("errorMsg").style.display = "none";
+  document.getElementById("successMsg").style.display = "none";
+  document.getElementById("errorMsg").style.display = "none";
 
-      // Here you would typically send the form data to a server
-      // For demo purposes, we'll just show the success message
-      setTimeout(() => {
-        document.getElementById("successMsg").style.display = "block";
-        document.getElementById("complaintForm").reset();
-        document.getElementById("imagePreview").innerHTML = '';
-        btn.disabled = false;
-        btn.innerText = isGujarati ? "ફરિયાદ દાખલ કરો" : "Submit Complaint";
+  // Collect form data
+  const formData = new FormData(document.getElementById("complaintForm"));
+  
+  // Convert form data to URL-encoded string for better compatibility
+  const urlEncodedData = new URLSearchParams();
+  formData.forEach((value, key) => {
+    urlEncodedData.append(key, value);
+  });
 
-        // Redirect to a new page after submission
-        window.location.href = "https://jaiminparmar84.github.io/Submitedpage/"; // Replace with the URL of the page you want to redirect to
-      }, 2000);
-    }
+  // Send the form data to the Google Apps Script Web App
+  fetch('https://script.google.com/macros/s/AKfycbyC2WVw2WtpCJHdKHKDJYQbUXy8I7U59hrNXfwekJL7scjmY8SwDAVMI5p82VwepCddGQ/exec', {
+    method: 'POST',
+    body: urlEncodedData
+  })
+  .then(response => response.text())
+  .then(data => {
+    document.getElementById("successMsg").style.display = "block";
+    document.getElementById("complaintForm").reset();
+    btn.disabled = false;
+    btn.innerText = isGujarati ? "ફરિયાદ દાખલ કરો" : "Submit Complaint";
+    window.location.href = "https://jaiminparmar84.github.io/Submitedpage/"; // Redirect after submission
+  })
+  .catch(error => {
+    document.getElementById("errorMsg").style.display = "block";
+    document.getElementById("errorMsg").innerText = isGujarati ? "ફરિયાદ સબમિટ કરતી વખતે ભૂલ આવી." : "Error submitting the complaint.";
+    btn.disabled = false;
+    btn.innerText = isGujarati ? "ફરિયાદ દાખલ કરો" : "Submit Complaint";
+  });
+}
+
+
   </script>
 </body>
 </html>
